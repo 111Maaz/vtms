@@ -1,39 +1,575 @@
-import { ArrowDown, ArrowRight, ArrowUpRight, Clock3, Compass, Heart, Leaf, MapPin, Phone, ShieldCheck, Sparkles, Star, Truck, Users, X } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUpRight,
+  Clock3,
+  Compass,
+  Heart,
+  Leaf,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Truck,
+  Users,
+  X,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { categories, getCategory, getProduct, heroImages, products } from '@/data/showroom';
+import { business, googleMapsUrl, reviews, whatsappInquiryUrl, whatsappUrl } from '@/data/business';
 import { ProductCard } from '@/components/showroom/ProductCard';
 import { SectionHeading } from '@/components/common/SectionHeading';
-import { whatsappUrl } from '@/components/common/WhatsAppButton';
-
-const reveal = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
+import { ContactForm } from '@/components/common/ContactForm';
+import { GoogleMap } from '@/components/common/GoogleMap';
+const reveal = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
 
 export function Home() {
   const [slide, setSlide] = useState(0);
-  useEffect(() => { const timer = window.setInterval(() => setSlide((current) => (current + 1) % heroImages.length), 8000); return () => window.clearInterval(timer); }, []);
+  useEffect(() => {
+    const timer = window.setInterval(() => setSlide((current) => (current + 1) % heroImages.length), 8000);
+    return () => window.clearInterval(timer);
+  }, []);
   const marquee = [...categories, ...categories];
-  return <div className="home-page">
-    <section className="hero"><div className="hero-images">{heroImages.map((image, index) => <motion.img key={image} src={image} alt="Sri Videm's Furniture showroom facade" initial={{ opacity: 0, scale: 1 }} animate={{ opacity: index === slide ? 1 : 0, scale: index === slide ? 1.05 : 1 }} transition={{ opacity: { duration: 1.5 }, scale: { duration: 8, ease: 'linear' } }} />)}</div><div className="hero-overlay" /><div className="hero-content"><motion.div initial="hidden" animate="visible" variants={reveal} className="hero-copy"><span className="eyebrow eyebrow--light">A considered home starts here</span><h1>Furniture that<br /><em>completes</em> every home.</h1><p>Discover beautifully crafted furniture collections for every room—from luxurious sofas and elegant dining sets to stylish bedrooms, office furniture and handcrafted wooden collections—all under one roof.</p><div className="hero-actions"><Link to="/collections" className="button button--light">Browse collections <ArrowUpRight size={17} /></Link><a href={whatsappUrl} target="_blank" rel="noreferrer" className="button button--glass">WhatsApp inquiry <ArrowRight size={17} /></a></div></motion.div></div><div className="scroll-cue"><span>Scroll to explore</span><ArrowDown size={16} /></div><div className="hero-location"><MapPin size={14} /> Hyderabad · Since 1998</div></section>
-    <section className="category-section section-padding"><div className="container"><SectionHeading eyebrow="The collection" title="Find your room's character." description="Explore a world of considered pieces, each selected to bring warmth, comfort and quiet confidence to your home." /></div><div className="category-track">{marquee.map((category, index) => <Link to={`/category/${category.slug}`} className="category-card" key={`${category.slug}-${index}`}><div className="category-card__image"><img src={category.image} alt={category.name} loading="lazy" /></div><div className="category-card__copy"><span>0{(index % categories.length) + 1}</span><h3>{category.name}</h3><ArrowUpRight size={18} /></div></Link>)}</div></section>
-    <section className="feature-section section-padding"><div className="container"><SectionHeading eyebrow="Curated spaces" title="Designed for living beautifully." /></div><div className="feature-masonry container"><Link to="/category/sofas" className="feature-panel feature-panel--large"><img src="/images/products/L_shape_corner_sofa_4.png" alt="Living room collection" loading="lazy" /><div><span>01 / Living</span><h3>Living room<br /><em>collection</em></h3><ArrowUpRight /></div></Link><Link to="/category/beds" className="feature-panel"><img src="/images/products/Designer_Bed.png" alt="Bedroom collection" loading="lazy" /><div><span>02 / Bedroom</span><h3>Bedroom<br /><em>collection</em></h3><ArrowUpRight /></div></Link><Link to="/category/dining" className="feature-panel"><img src="/images/products/Dining_Table.png" alt="Dining collection" loading="lazy" /><div><span>03 / Gather</span><h3>Dining<br /><em>collection</em></h3><ArrowUpRight /></div></Link></div></section>
-    <section className="why-section section-padding"><div className="container why-grid"><div><SectionHeading eyebrow="The Videm's difference" title="A little more thought in every detail." description="For over two decades, we have helped Hyderabad find furniture that feels personal, enduring and entirely their own." /></div><div className="why-cards">{[[Sparkles, 'Premium quality', 'Materials and craftsmanship chosen to be lived with.'], [Compass, 'Modern design', 'A balance of contemporary form and timeless warmth.'], [Truck, 'Reliable delivery', 'A smooth journey from our showroom to your home.'], [Heart, 'Made for you', 'Guidance that makes choosing feel effortless.']].map(([Icon, title, text]) => <motion.div className="why-card" key={title as string} whileInView={{ opacity: [0, 1], y: [18, 0] }} viewport={{ once: true }} transition={{ duration: .5 }}><Icon size={25} strokeWidth={1.3} /><h3>{title as string}</h3><p>{text as string}</p></motion.div>)}</div></div></section>
-    <VisitSection />
-  </div>;
+
+  return (
+    <div className="home-page">
+      <section className="hero">
+        <div className="hero-images">
+          {heroImages.map((image, index) => (
+            <motion.img
+              key={image}
+              src={image}
+              alt={`${business.name} showroom facade`}
+              initial={{ opacity: 0, scale: 1 }}
+              animate={{ opacity: index === slide ? 1 : 0, scale: index === slide ? 1.05 : 1 }}
+              transition={{ opacity: { duration: 1.5 }, scale: { duration: 8, ease: 'linear' } }}
+            />
+          ))}
+        </div>
+        <div className="hero-overlay" />
+        <div className="hero-content">
+          <motion.div initial="hidden" animate="visible" variants={reveal} className="hero-copy">
+            <span className="eyebrow eyebrow--light">A considered home starts here</span>
+            <h1>
+              Furniture that
+              <br />
+              <em>completes</em> every home.
+            </h1>
+            {/* <p>
+              Discover beautifully crafted furniture collections for every room—from luxurious sofas and elegant dining
+              sets to stylish bedrooms, office furniture and handcrafted wooden collections—all under one roof.
+            </p> */}
+            <div className="hero-actions">
+              <Link to="/collections" className="button button--light">
+                Browse collections <ArrowUpRight size={17} />
+              </Link>
+              {whatsappUrl ? (
+                <a href={whatsappUrl} target="_blank" rel="noreferrer" className="button button--glass">
+                  WhatsApp inquiry <ArrowRight size={17} />
+                </a>
+              ) : (
+                <Link to="/contact" className="button button--glass">
+                  Send inquiry <ArrowRight size={17} />
+                </Link>
+              )}
+            </div>
+          </motion.div>
+        </div>
+        <div className="scroll-cue">
+          <span>Scroll to explore</span>
+          <ArrowDown size={16} />
+        </div>
+        <div className="hero-location">
+          <MapPin size={14} /> Hyderabad · Since {business.since}
+        </div>
+      </section>
+
+      <section className="category-section section-padding">
+        <div className="container">
+          <SectionHeading
+            eyebrow="The collection"
+            title="Find your room's character."
+            description="Explore a world of considered pieces, each selected to bring warmth, comfort and quiet confidence to your home."
+          />
+        </div>
+        <div className="category-track">
+          {marquee.map((category, index) => (
+            <Link to={`/category/${category.slug}`} className="category-card" key={`${category.slug}-${index}`}>
+              <div className="category-card__image">
+                <img src={category.image} alt={category.name} loading="lazy" />
+              </div>
+              <div className="category-card__copy">
+                <span>0{(index % categories.length) + 1}</span>
+                <h3>{category.name}</h3>
+                <ArrowUpRight size={18} />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="feature-section section-padding">
+        <div className="container">
+          <SectionHeading eyebrow="Curated spaces" title="Designed for living beautifully." />
+        </div>
+        <div className="feature-masonry container">
+          <Link to="/category/sofas" className="feature-panel feature-panel--large">
+            <img src="/images/products/L_shape_corner_sofa_4.png" alt="Living room collection" loading="lazy" />
+            <div>
+              <span>01 / Living</span>
+              <h3>
+                Living room
+                <br />
+                <em>collection</em>
+              </h3>
+              <ArrowUpRight />
+            </div>
+          </Link>
+          <Link to="/category/beds" className="feature-panel">
+            <img src="/images/products/Designer_Bed.png" alt="Bedroom collection" loading="lazy" />
+            <div>
+              <span>02 / Bedroom</span>
+              <h3>
+                Bedroom
+                <br />
+                <em>collection</em>
+              </h3>
+              <ArrowUpRight />
+            </div>
+          </Link>
+          <Link to="/category/dining" className="feature-panel">
+            <img src="/images/products/Dining_Table.png" alt="Dining collection" loading="lazy" />
+            <div>
+              <span>03 / Gather</span>
+              <h3>
+                Dining
+                <br />
+                <em>collection</em>
+              </h3>
+              <ArrowUpRight />
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      <section className="why-section section-padding">
+        <div className="container why-grid">
+          <div>
+            <SectionHeading
+              eyebrow="The Videms difference"
+              title="A little more thought in every detail."
+              description={`For over two decades, we have helped Hyderabad find furniture that feels personal, enduring and entirely their own.`}
+            />
+          </div>
+          <div className="why-cards">
+            {[
+              [Sparkles, 'Premium quality', 'Materials and craftsmanship chosen to be lived with.'],
+              [Compass, 'Modern design', 'A balance of contemporary form and timeless warmth.'],
+              [Truck, 'Reliable delivery', 'A smooth journey from our showroom to your home.'],
+              [Heart, 'Made for you', 'Guidance that makes choosing feel effortless.'],
+            ].map(([Icon, title, text]) => (
+              <motion.div
+                className="why-card"
+                key={title as string}
+                whileInView={{ opacity: [0, 1], y: [18, 0] }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <Icon size={25} strokeWidth={1.3} />
+                <h3>{title as string}</h3>
+                <p>{text as string}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <ReviewsSection />
+      <VisitSection />
+    </div>
+  );
 }
 
-export function Collections() { return <><PageHero eyebrow="The edit" title={<>Collections for<br /><em>living well.</em></>} text="From the first morning coffee to the last guest leaving, find pieces that make your everyday feel a little more considered." image="/images/products/L_shape_corner_sofa_4.png" /><section className="section-padding"><div className="container"><div className="product-grid">{products.map((product) => <ProductCard key={product.id} product={product} />)}</div></div></section></>; }
+function ReviewsSection() {
+  return (
+    <section className="reviews-section section-padding">
+      <div className="container">
+        <SectionHeading eyebrow="Google reviews" title="Trusted by Hyderabad families." />
+        <div className="reviews-summary">
+          <Star size={22} fill="currentColor" />
+          <span>
+            <strong>{business.rating.toFixed(1)}</strong> Rating
+          </span>
+          <span className="reviews-summary__divider" aria-hidden="true" />
+          <span>
+            <strong>{business.reviewCount}</strong> Google Reviews
+          </span>
+        </div>
+        <div className="reviews-grid">
+          {reviews.map((review) => (
+            <article className="review-card" key={review.author}>
+              <div className="review-card__stars" aria-label="5 out of 5 stars">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <Star key={index} size={14} fill="currentColor" />
+                ))}
+              </div>
+              <p>&ldquo;{review.text}&rdquo;</p>
+              <span>{review.author}</span>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-export function CategoryPage() { const { slug = '' } = useParams(); const category = getCategory(slug); const categoryProducts = products.filter((product) => product.category.toLowerCase().includes(category?.name.toLowerCase().replace(' sets', '').replace(' furniture', '') || slug)); if (!category) return <NotFound />; return <><PageHero eyebrow="The collection" title={<>{category.name}<br /><em>by Videm's.</em></>} text={category.description + ' — pieces with a presence, made to settle naturally into your home.'} image={category.image} /><section className="section-padding"><div className="container"><div className="collection-intro"><span className="eyebrow">Selected pieces</span><p>Every piece is available to experience at our Hyderabad showroom. Speak with our team for finishes, configurations and a closer look.</p></div><div className="product-grid">{(categoryProducts.length ? categoryProducts : products.slice(0, 3)).map((product) => <ProductCard key={product.id} product={product} />)}</div></div></section></>; }
+export function Collections() {
+  return (
+    <>
+      <PageHero
+        eyebrow="The edit"
+        title={
+          <>
+            Collections for
+            <br />
+            <em>living well.</em>
+          </>
+        }
+        text="From the first morning coffee to the last guest leaving, find pieces that make your everyday feel a little more considered."
+        image="/images/products/L_shape_corner_sofa_4.png"
+      />
+      <section className="section-padding">
+        <div className="container">
+          <div className="product-grid">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
 
-export function ProductPage() { const { slug = '' } = useParams(); const product = getProduct(slug); const [zoom, setZoom] = useState(false); if (!product) return <NotFound />; const related = products.filter((item) => item.id !== product.id).slice(0, 3); return <section className="product-detail section-padding"><div className="container"><div className="breadcrumb"><Link to="/collections">Collections</Link><ArrowRight size={14} />{product.category}<ArrowRight size={14} />{product.name}</div><div className="product-detail__grid"><button className="product-detail__visual" onClick={() => setZoom(true)} aria-label={`Enlarge ${product.name}`}><img src={product.images[0]} alt={product.name} /><span>Click to enlarge <ArrowUpRight size={15} /></span></button><div className="product-detail__copy"><span className="eyebrow">{product.category}</span><h1>{product.name}</h1><p className="lead">{product.description}</p><div className="detail-rule" /><dl><div><dt>Dimensions</dt><dd>{product.dimensions}</dd></div><div><dt>Materials</dt><dd>{product.materials.join(' · ')}</dd></div><div><dt>Availability</dt><dd>Available to experience in our showroom</dd></div></dl><a href={`${whatsappUrl}&item=${encodeURIComponent(product.name)}`} target="_blank" rel="noreferrer" className="button button--dark">Enquire about this piece <ArrowUpRight size={17} /></a><Link to="/contact" className="text-link">Plan a showroom visit <ArrowRight size={16} /></Link></div></div><div className="related"><SectionHeading eyebrow="You may also like" title="More to consider." /><div className="product-grid">{related.map((item) => <ProductCard product={item} key={item.id} />)}</div></div></div>{zoom && <div className="image-modal" onClick={() => setZoom(false)} role="dialog" aria-label="Enlarged product image"><button onClick={() => setZoom(false)} aria-label="Close image"><X /></button><img src={product.images[0]} alt={product.name} /></div>}</section>; }
+export function CategoryPage() {
+  const { slug = '' } = useParams();
+  const category = getCategory(slug);
+  const categoryProducts = products.filter((product) =>
+    product.category.toLowerCase().includes(category?.name.toLowerCase().replace(' sets', '').replace(' furniture', '') || slug),
+  );
+  if (!category) return <NotFound />;
 
-function PageHero({ eyebrow, title, text, image }: { eyebrow: string; title: React.ReactNode; text: string; image: string }) { return <section className="page-hero"><div className="page-hero__image"><img src={image} alt="" /></div><div className="page-hero__shade" /><div className="container page-hero__content"><span className="eyebrow eyebrow--light">{eyebrow}</span><h1>{title}</h1><p>{text}</p></div></section>; }
+  return (
+    <>
+      <PageHero
+        eyebrow="The collection"
+        title={
+          <>
+            {category.name}
+            <br />
+            <em>by Videms.</em>
+          </>
+        }
+        text={`${category.description} — pieces with a presence, made to settle naturally into your home.`}
+        image={category.image}
+      />
+      <section className="section-padding">
+        <div className="container">
+          <div className="collection-intro">
+            <span className="eyebrow">Selected pieces</span>
+            <p>
+              Every piece is available to experience at our Hyderabad showroom. Speak with our team for finishes,
+              configurations and a closer look.
+            </p>
+          </div>
+          <div className="product-grid">
+            {(categoryProducts.length ? categoryProducts : products.slice(0, 3)).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
 
-function VisitSection() { return <section className="visit-section section-padding"><div className="container visit-grid"><div className="visit-copy"><SectionHeading eyebrow="Come by" title={<>See it<br /><em>in person.</em></>} description="The best way to choose a piece is to take your time with it. Visit our spacious showroom in Hyderabad and let us help you shape your space." /><div className="visit-details"><p><MapPin size={18} /><span>Sri Videm's Furniture Showroom<br />Main Road, Kukatpally, Hyderabad, Telangana 500072</span></p><p><Clock3 size={18} /><span>Mon – Sun<br />10:30 am – 8:30 pm</span></p><p><Phone size={18} /><span>+919666114610</span></p></div><div className="visit-actions"><a href="tel:+919666114610" className="button button--dark">Call showroom <Phone size={16} /></a><a href="https://maps.google.com/?q=Jubilee+Hills+Hyderabad" target="_blank" rel="noreferrer" className="text-link">Get directions <ArrowUpRight size={16} /></a></div></div><div className="map-card"><div className="map-card__pattern"><MapPin size={32} /><span>Jubilee Hills<br /><small>Hyderabad, Telangana</small></span></div><a href="https://maps.google.com/?q=Jubilee+Hills+Hyderabad" target="_blank" rel="noreferrer" className="map-card__link">Open in Google Maps <ArrowUpRight size={16} /></a></div></div></section>; }
+export function ProductPage() {
+  const { slug = '' } = useParams();
+  const product = getProduct(slug);
+  const [zoom, setZoom] = useState(false);
+  if (!product) return <NotFound />;
+  const related = products.filter((item) => item.id !== product.id).slice(0, 3);
+  const productInquiryUrl = whatsappInquiryUrl(`Hello ${business.name}, I'd like to enquire about ${product.name}.`);
 
-export function About() { return <><PageHero eyebrow="Our story" title={<>Made for<br /><em>living.</em></>} text="Sri Videm's began with a simple belief: the furniture around us should make daily life feel more beautiful." image="/images/hero/Showroom2.png" /><section className="story-section section-padding"><div className="container story-grid"><div className="story-number">01</div><div><span className="eyebrow">A Hyderabad original</span><h2>Furniture should feel like an invitation.</h2><p>Since 1998, Sri Videm's Furniture has been a place where Hyderabad families come to find the pieces that define their spaces. We bring together honest materials, skilled craft and a distinctly modern point of view.</p><p>Our showroom is deliberately unhurried. Take your time, feel the fabrics, imagine the room. Our team is here to offer perspective, not pressure.</p></div></div></section><section className="values-section section-padding"><div className="container"><SectionHeading eyebrow="What we believe" title="The details make the difference." /><div className="values-grid">{[[Leaf, 'Thoughtful materials'], [ShieldCheck, 'Enduring quality'], [Users, 'Human guidance'], [Star, 'Everyday beauty']].map(([Icon, title]) => <div className="value-item" key={title as string}><Icon /><h3>{title as string}</h3></div>)}</div></div></section></>; }
+  return (
+    <section className="product-detail section-padding">
+      <div className="container">
+        <div className="breadcrumb">
+          <Link to="/collections">Collections</Link>
+          <ArrowRight size={14} />
+          {product.category}
+          <ArrowRight size={14} />
+          {product.name}
+        </div>
+        <div className="product-detail__grid">
+          <button className="product-detail__visual" onClick={() => setZoom(true)} aria-label={`Enlarge ${product.name}`}>
+            <img src={product.images[0]} alt={product.name} />
+            <span>
+              Click to enlarge <ArrowUpRight size={15} />
+            </span>
+          </button>
+          <div className="product-detail__copy">
+            <span className="eyebrow">{product.category}</span>
+            <h1>{product.name}</h1>
+            <p className="lead">{product.description}</p>
+            <div className="detail-rule" />
+            <dl>
+              <div>
+                <dt>Dimensions</dt>
+                <dd>{product.dimensions}</dd>
+              </div>
+              <div>
+                <dt>Materials</dt>
+                <dd>{product.materials.join(' · ')}</dd>
+              </div>
+              <div>
+                <dt>Availability</dt>
+                <dd>Available to experience in our showroom</dd>
+              </div>
+            </dl>
+            {productInquiryUrl ? (
+              <a
+                href={productInquiryUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="button button--dark"
+              >
+                Enquire about this piece <ArrowUpRight size={17} />
+              </a>
+            ) : (
+              <Link to="/contact" className="button button--dark">
+                Enquire about this piece <ArrowUpRight size={17} />
+              </Link>
+            )}
+            <Link to="/contact" className="text-link">
+              Plan a showroom visit <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+        <div className="related">
+          <SectionHeading eyebrow="You may also like" title="More to consider." />
+          <div className="product-grid">
+            {related.map((item) => (
+              <ProductCard product={item} key={item.id} />
+            ))}
+          </div>
+        </div>
+      </div>
+      {zoom && (
+        <div className="image-modal" onClick={() => setZoom(false)} role="dialog" aria-label="Enlarged product image">
+          <button onClick={() => setZoom(false)} aria-label="Close image">
+            <X />
+          </button>
+          <img src={product.images[0]} alt={product.name} />
+        </div>
+      )}
+    </section>
+  );
+}
 
-export function Contact() { return <><PageHero eyebrow="The showroom" title={<>Let's make<br /><em>room for you.</em></>} text="Whether you are furnishing one room or beginning with a blank canvas, our team would love to welcome you." image="/images/hero/Showroom1.png" /><VisitSection /><section className="contact-note section-padding"><div className="container"><span className="eyebrow">Have a question?</span><h2>Start a conversation on WhatsApp.</h2><a href={whatsappUrl} target="_blank" rel="noreferrer" className="button button--dark">Message our team <ArrowUpRight size={17} /></a></div></section></>; }
+function PageHero({
+  eyebrow,
+  title,
+  text,
+  image,
+}: {
+  eyebrow: string;
+  title: React.ReactNode;
+  text: string;
+  image: string;
+}) {
+  return (
+    <section className="page-hero">
+      <div className="page-hero__image">
+        <img src={image} alt="" />
+      </div>
+      <div className="page-hero__shade" />
+      <div className="container page-hero__content">
+        <span className="eyebrow eyebrow--light">{eyebrow}</span>
+        <h1>{title}</h1>
+        <p>{text}</p>
+      </div>
+    </section>
+  );
+}
 
-export function NotFound() { return <div className="empty-page section-padding"><span className="eyebrow">A quiet corner</span><h1>We couldn't find that piece.</h1><Link to="/collections" className="button button--dark">Return to collections <ArrowRight size={16} /></Link></div>; }
+function VisitSection() {
+  return (
+    <section className="visit-section section-padding">
+      <div className="container visit-grid">
+        <div className="visit-copy">
+          <SectionHeading
+            eyebrow="Come by"
+            title={
+              <>
+                See it
+                <br />
+                <em>in person.</em>
+              </>
+            }
+            description="The best way to choose a piece is to take your time with it. Visit our spacious showroom in Hyderabad and let us help you shape your space."
+          />
+          <div className="visit-details">
+            <p>
+              <MapPin size={18} />
+              <span>
+                {business.name}
+                <br />
+                {business.address.footerLines.map((line, index) => (
+                  <span key={line}>
+                    {line}
+                    {index < business.address.footerLines.length - 1 && <br />}
+                  </span>
+                ))}
+              </span>
+            </p>
+            <p>
+              <Clock3 size={18} />
+              <span>
+                Mon – Sun
+                <br />
+                {business.hours}
+              </span>
+            </p>
+            <p>
+              <Phone size={18} />
+              <span>{business.phone}</span>
+            </p>
+          </div>
+          <div className="visit-actions">
+            <a href={`tel:${business.phoneTel}`} className="button button--dark">
+              Call showroom <Phone size={16} />
+            </a>
+            <a href={googleMapsUrl} target="_blank" rel="noreferrer" className="text-link">
+              Get directions <ArrowUpRight size={16} />
+            </a>
+          </div>
+        </div>
+        <GoogleMap />
+      </div>
+    </section>
+  );
+}
+
+export function About() {
+  return (
+    <>
+      <PageHero
+        eyebrow="Our story"
+        title={
+          <>
+            Made for
+            <br />
+            <em>living.</em>
+          </>
+        }
+        text={`${business.name} began with a simple belief: the furniture around us should make daily life feel more beautiful.`}
+        image="/images/hero/Showroom2.png"
+      />
+      <section className="story-section section-padding">
+        <div className="container story-grid">
+          <div className="story-number">01</div>
+          <div>
+            <span className="eyebrow">A Hyderabad original</span>
+            <h2>Furniture should feel like an invitation.</h2>
+            <p>
+              Since {business.since}, {business.name} has been a place where Hyderabad families come to find the pieces
+              that define their spaces. We bring together honest materials, skilled craft and a distinctly modern point
+              of view.
+            </p>
+            <p>
+              Our showroom is deliberately unhurried. Take your time, feel the fabrics, imagine the room. Our team is
+              here to offer perspective, not pressure.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section className="values-section section-padding">
+        <div className="container">
+          <SectionHeading eyebrow="What we believe" title="The details make the difference." />
+          <div className="values-grid">
+            {[
+              [Leaf, 'Thoughtful materials'],
+              [ShieldCheck, 'Enduring quality'],
+              [Users, 'Human guidance'],
+              [Star, 'Everyday beauty'],
+            ].map(([Icon, title]) => (
+              <div className="value-item" key={title as string}>
+                <Icon />
+                <h3>{title as string}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+export function Contact() {
+  return (
+    <>
+      <PageHero
+        eyebrow="The showroom"
+        title={
+          <>
+            Let's make
+            <br />
+            <em>room for you.</em>
+          </>
+        }
+        text="Whether you are furnishing one room or beginning with a blank canvas, our team would love to welcome you."
+        image="/images/hero/Showroom1.png"
+      />
+      <VisitSection />
+      <section className="contact-form-section section-padding">
+        <div className="container contact-form-layout">
+          <div>
+            <SectionHeading
+              eyebrow="Send an inquiry"
+              title="Tell us what you're looking for."
+              description="Share a few details and our team will follow up. You can also call us directly during showroom hours."
+            />
+            <div className="contact-form-aside">
+              <a href={`tel:${business.phoneTel}`} className="button button--dark">
+                Call {business.phone} <Phone size={16} />
+              </a>
+              {/* <a href={googleMapsUrl} target="_blank" rel="noreferrer" className="text-link">
+                Open in Google Maps <ArrowUpRight size={16} />
+              </a> */}
+            </div>
+          </div>
+          <ContactForm />
+        </div>
+      </section>
+    </>
+  );
+}
+
+export function NotFound() {
+  return (
+    <div className="empty-page section-padding">
+      <span className="eyebrow">A quiet corner</span>
+      <h1>We couldn't find that piece.</h1>
+      <Link to="/collections" className="button button--dark">
+        Return to collections <ArrowRight size={16} />
+      </Link>
+    </div>
+  );
+}

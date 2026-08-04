@@ -1,14 +1,30 @@
 import { MessageCircle } from 'lucide-react';
-
-const whatsappUrl = 'https://wa.me/919000000000?text=Hello%20Sri%20Videm%27s%20Furniture%2C%20I%27d%20like%20to%20make%20an%20inquiry.';
+import { business, whatsappUrl } from '@/data/business';
 
 export function WhatsAppButton({ compact = false }: { compact?: boolean }) {
+  if (!whatsappUrl) {
+    return (
+      <span
+        className={`whatsapp-button whatsapp-button--inactive group ${compact ? 'whatsapp-button--compact' : ''}`}
+        aria-disabled="true"
+        title="WhatsApp contact not available"
+      >
+        <MessageCircle size={compact ? 18 : 22} strokeWidth={1.7} />
+        <span className="whatsapp-label">{compact ? 'Inquire' : 'WhatsApp us'}</span>
+      </span>
+    );
+  }
+
   return (
-    <a href={whatsappUrl} target="_blank" rel="noreferrer" aria-label="Chat with Sri Videm's Furniture on WhatsApp" className={`whatsapp-button group ${compact ? 'whatsapp-button--compact' : ''}`}>
+    <a
+      href={whatsappUrl}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={`Chat with ${business.name} on WhatsApp`}
+      className={`whatsapp-button group ${compact ? 'whatsapp-button--compact' : ''}`}
+    >
       <MessageCircle size={compact ? 18 : 22} strokeWidth={1.7} />
       <span className="whatsapp-label">{compact ? 'Inquire' : 'WhatsApp us'}</span>
     </a>
   );
 }
-
-export { whatsappUrl };
